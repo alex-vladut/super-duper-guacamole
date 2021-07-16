@@ -7,6 +7,10 @@ const handler = async (event) => {
   if (!organisationId || !userId) {
     return {
       statusCode: "400",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
       body: JSON.stringify({
         error: "Missing organisationId and/or userId params",
       }),
@@ -15,7 +19,7 @@ const handler = async (event) => {
 
   const params = {
     RoleArn: process.env.TENANT_USER_ROLE_ARN,
-    RoleSessionName: `${organisationId}-${userId}`,
+    RoleSessionName: userId,
     Policy: getUserRolePolicy({ organisationId, userId }),
   };
   const command = new AssumeRoleCommand(params);
@@ -23,6 +27,10 @@ const handler = async (event) => {
 
   return {
     statusCode: "200",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
     body: JSON.stringify({ credentials: data.Credentials }),
   };
 };

@@ -65,6 +65,10 @@ export class CdkInfraStack extends cdk.Stack {
 
     const api = new apigateway.LambdaRestApi(this, "ApiGatewayAwsCredentials", {
       handler: tokenVendorMachineLambda,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
     });
 
     new cdk.CfnOutput(this, "BucketName", { value: bucket.bucketName });
@@ -73,5 +77,6 @@ export class CdkInfraStack extends cdk.Stack {
       value: tenantUserRole.roleArn,
     });
     new cdk.CfnOutput(this, "ApiUrl", { value: api.url });
+    new cdk.CfnOutput(this, "Region", { value: region });
   }
 }
