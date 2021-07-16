@@ -7,7 +7,9 @@ const handler = async (event) => {
   if (!organisationId || !userId) {
     return {
       statusCode: "400",
-      body: JSON.stringify({ error: "Missing params" }),
+      body: JSON.stringify({
+        error: "Missing organisationId and/or userId params",
+      }),
     };
   }
 
