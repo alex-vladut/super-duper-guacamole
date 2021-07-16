@@ -1,0 +1,14 @@
+{
+  "name": "token-vending-machine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.21.0"
+  }
+}
