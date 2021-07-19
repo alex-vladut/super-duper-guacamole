@@ -8,7 +8,19 @@ export class CdkInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const bucket = new s3.Bucket(this, "super-duper-guacamole-bucket");
+    const bucket = new s3.Bucket(this, "super-duper-guacamole-bucket", {
+      cors: [
+        {
+          allowedMethods: [
+            s3.HttpMethods.GET,
+            s3.HttpMethods.POST,
+            s3.HttpMethods.PUT,
+          ],
+          allowedOrigins: ["*"],
+          allowedHeaders: ["*"],
+        },
+      ],
+    });
 
     const lambdaRole = new iam.Role(
       this,
@@ -25,6 +37,17 @@ export class CdkInfraStack extends cdk.Stack {
       {
         assumedBy: new iam.ArnPrincipal(lambdaRole.roleArn),
       }
+    );
+    tenantUserRole.attachInlinePolicy(
+      new iam.Policy(this, "super-duper-guacamole-user-role-policy", {
+        statements: [
+          new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            resources: ["*"], // [bucket.bucketArn], <-- I don't understand why it doesn't work when specifying the bucket
+            actions: ["s3:*"],
+          }),
+        ],
+      })
     );
     lambdaRole.addToPolicy(
       new iam.PolicyStatement({

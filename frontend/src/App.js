@@ -21,9 +21,12 @@ function App() {
   const [isFilePicked, setIsFilePicked] = useState(false);
 
   useEffect(() => {
+    console.log({ organisationId, userId });
     fetch(apiUrl + `?organisationId=${organisationId}&userId=${userId}`)
       .then((res) => res.json())
-      .then((res) => setCredentials(res.credentials));
+      .then((res) => {
+        setCredentials(res.credentials);
+      });
   }, []);
 
   return (
@@ -67,9 +70,21 @@ function App() {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: `${organisationId}/${userId}/${selectedFile.name}`,
+      Body: "hello",
     });
-    const url = await getSignedUrl(client, command, { expiresIn: 3600 });
-    console.log(url);
+    await client.send(command);
+    // const signedUrl = await getSignedUrl(client, command, { expiresIn: 3600 });
+    // const formData = new FormData();
+    // formData.append("Content-Type", selectedFile.type);
+    // formData.append("file", selectedFile); // The file has be the last element
+
+    // await fetch(signedUrl, {
+    //   method: "PUT",
+    //   body: "hello",
+    //   headers: {
+    //     "Content-Type": "text/plain",
+    //   },
+    // });
   }
 }
 

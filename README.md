@@ -31,3 +31,8 @@ cdk deploy --profile <profile-name> -O ../frontend/src/exports.json
 cd frontend
 yarn start
 ```
+
+## Investigate
+
+- Is it safe to expose AWS credentials on the client side? => most likely should be OK, as those are short-lived and will have a very limited set of permissions attached to it anyways
+- How can we restrict the types of files a user is allowed to upload and the maximum size of a file?
