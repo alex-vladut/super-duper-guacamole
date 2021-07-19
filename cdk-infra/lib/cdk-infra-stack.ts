@@ -38,17 +38,14 @@ export class CdkInfraStack extends cdk.Stack {
         assumedBy: new iam.ArnPrincipal(lambdaRole.roleArn),
       }
     );
-    tenantUserRole.attachInlinePolicy(
-      new iam.Policy(this, "super-duper-guacamole-user-role-policy", {
-        statements: [
-          new iam.PolicyStatement({
-            effect: iam.Effect.ALLOW,
-            resources: ["*"], // [bucket.bucketArn], <-- I don't understand why it doesn't work when specifying the bucket
-            actions: ["s3:*"],
-          }),
-        ],
-      })
-    );
+    bucket.grantReadWrite(tenantUserRole);
+
+    // This approach worked fine - if you ever need to retrict access to a certain prefix known beforehand
+    // bucket.grantReadWrite(
+    //   tenantUserRole,
+    //   "b6effee0-ce0b-4410-b270-ac8803446f50/4cc44c46-b209-4d08-b21a-ba11b728db0a/*"
+    // );
+
     lambdaRole.addToPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,

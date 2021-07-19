@@ -70,21 +70,23 @@ function App() {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: `${organisationId}/${userId}/${selectedFile.name}`,
-      Body: "hello",
+      // Body: "hello",
     });
-    await client.send(command);
-    // const signedUrl = await getSignedUrl(client, command, { expiresIn: 3600 });
-    // const formData = new FormData();
-    // formData.append("Content-Type", selectedFile.type);
-    // formData.append("file", selectedFile); // The file has be the last element
+    // can use this method to interact directly with S3, or the next line to upload through signed URL
+    // await client.send(command);
 
-    // await fetch(signedUrl, {
-    //   method: "PUT",
-    //   body: "hello",
-    //   headers: {
-    //     "Content-Type": "text/plain",
-    //   },
-    // });
+    const signedUrl = await getSignedUrl(client, command, { expiresIn: 3600 });
+    const formData = new FormData();
+    formData.append("Content-Type", selectedFile.type);
+    formData.append("file", selectedFile); // The file has be the last element
+
+    await fetch(signedUrl, {
+      method: "PUT",
+      body: "hello",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
   }
 }
 
