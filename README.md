@@ -1,6 +1,6 @@
 ## Description
 
-A simple project to prototype implementing a Token Vending Machine for accessing AWS resources in a multi-tenant architecture. The mechanism is described in the AWS Whitepaper [SaaS Tenant Isolation Strategies](https://d1.awsstatic.com/whitepapers/saas-tenant-isolation-strategies.pdf) and [this article](https://aws.amazon.com/blogs/apn/isolating-saas-tenants-with-dynamically-generated-iam-policies/).
+A simple project to prototype implementing a Token Vending Machine for accessing AWS resources in a multi-tenant architecture. The mechanism is described in the AWS Whitepaper [SaaS Tenant Isolation Strategies](https://d1.awsstatic.com/whitepapers/saas-tenant-isolation-strategies.pdf) and [this article](https://aws.amazon.com/blogs/apn/isolating-saas-tenants-with-dynamically-generated-iam-policies/), for the implementation specific details. Another interesting read is [this article](https://aws.amazon.com/blogs/security/how-to-implement-saas-tenant-isolation-with-abac-and-aws-iam/) where ABAC is used for the access strategy instead of dynamically generating IAM policies.
 
 ## Prerequisites
 
@@ -37,3 +37,6 @@ yarn start
 - Is it safe to expose AWS credentials on the client side? => most likely should be OK, as those are short-lived and will have a very limited set of permissions attached to it anyways
 - How can we restrict the types of files a user is allowed to upload and the maximum size of a file?
 - Should evaluate the deployment bundle size (they say AWS SDK v3 is tree shakable, but should check if it's still too big for the client)
+  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
+  https://stackoverflow.com/questions/37617844/restricting-file-types-on-amazon-s3-bucket-with-a-policy
+  https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html

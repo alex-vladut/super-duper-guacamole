@@ -39,12 +39,22 @@ export class CdkInfraStack extends cdk.Stack {
       }
     );
     bucket.grantReadWrite(tenantUserRole);
+    // tenant role ABAC with tags
 
-    // This approach worked fine - if you ever need to retrict access to a certain prefix known beforehand
-    // bucket.grantReadWrite(
-    //   tenantUserRole,
-    //   "b6effee0-ce0b-4410-b270-ac8803446f50/4cc44c46-b209-4d08-b21a-ba11b728db0a/*"
-    // );
+    const tenantUserRoleWithTags = new iam.Role(
+      this,
+      "super-duper-guacamole-user-role-with-tags",
+      {
+        // TODO: I updated the trust policy manually in AWS console to include "sts:TagSession"
+        // I don't know how to add it through CDK
+        assumedBy: new iam.ArnPrincipal(lambdaRole.roleArn),
+      }
+    );
+
+    bucket.grantReadWrite(
+      tenantUserRoleWithTags,
+      "${aws:PrincipalTag/organisationId}/${aws:PrincipalTag/userId}/*"
+    );
 
     lambdaRole.addToPolicy(
       new iam.PolicyStatement({
@@ -53,6 +63,14 @@ export class CdkInfraStack extends cdk.Stack {
         actions: ["sts:AssumeRole"],
       })
     );
+    lambdaRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        resources: [tenantUserRoleWithTags.roleArn],
+        actions: ["sts:AssumeRole", "sts:TagSession"],
+      })
+    );
+
     lambdaRole.addToPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
@@ -81,6 +99,10 @@ export class CdkInfraStack extends cdk.Stack {
       "TENANT_USER_ROLE_ARN",
       tenantUserRole.roleArn
     );
+    tokenVendorMachineLambda.addEnvironment(
+      "TENANT_USER_ROLE_WITH_TAGS_ARN",
+      tenantUserRoleWithTags.roleArn
+    );
     tokenVendorMachineLambda.addEnvironment("S3_BUCKET_ARN", bucket.bucketArn);
 
     const api = new apigateway.LambdaRestApi(this, "ApiGatewayAwsCredentials", {
@@ -95,6 +117,9 @@ export class CdkInfraStack extends cdk.Stack {
     new cdk.CfnOutput(this, "BucketArn", { value: bucket.bucketArn });
     new cdk.CfnOutput(this, "UserRoleArn", {
       value: tenantUserRole.roleArn,
+    });
+    new cdk.CfnOutput(this, "UserRoleSessionTagsArn", {
+      value: tenantUserRoleWithTags.roleArn,
     });
     new cdk.CfnOutput(this, "ApiUrl", { value: api.url });
     new cdk.CfnOutput(this, "Region", { value: region });

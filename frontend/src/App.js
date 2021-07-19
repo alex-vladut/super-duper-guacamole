@@ -35,7 +35,9 @@ function App() {
 
   useEffect(() => {
     console.log({ organisationId, userId });
-    fetch(apiUrl + `?organisationId=${organisationId}&userId=${userId}`)
+    fetch(
+      apiUrl + `?organisationId=${organisationId}&userId=${userId}&type=abac`
+    )
       .then((res) => res.json())
       .then((res) => {
         setCredentials(res.credentials);
