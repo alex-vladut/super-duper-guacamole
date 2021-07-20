@@ -37,6 +37,47 @@ yarn start
 - Is it safe to expose AWS credentials on the client side? => most likely should be OK, as those are short-lived and will have a very limited set of permissions attached to it anyways
 - How can we restrict the types of files a user is allowed to upload and the maximum size of a file?
 - Should evaluate the deployment bundle size (they say AWS SDK v3 is tree shakable, but should check if it's still too big for the client)
-  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
-  https://stackoverflow.com/questions/37617844/restricting-file-types-on-amazon-s3-bucket-with-a-policy
-  https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
+
+## Other resources
+
+- https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
+- https://stackoverflow.com/questions/37617844/restricting-file-types-on-amazon-s3-bucket-with-a-policy
+- https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
+
+## Production bundle size
+
+### Barebone app (no external dependencies)
+
+File sizes after gzip:
+
+```
+  41.33 KB build/static/js/2.6d3420fc.chunk.js
+  1.62 KB build/static/js/3.c68cbf14.chunk.js
+  1.17 KB build/static/js/runtime-main.0e69a58b.js
+  376 B build/static/js/main.ab092e2e.chunk.js
+  278 B build/static/css/main.6dea0f05.chunk.css
+```
+
+### With AWS S3 client
+
+File sizes after gzip:
+
+```
+  107.55 KB (+66.21 KB)  build/static/js/2.5d91f082.chunk.js
+  1.65 KB (+1.29 KB)     build/static/js/main.e29714ae.chunk.js
+  1.62 KB (+1 B)         build/static/js/3.ccf98651.chunk.js
+  1.17 KB                build/static/js/runtime-main.2156dbdb.js
+  531 B (+253 B)         build/static/css/main.8c8b27cf.chunk.css
+```
+
+### With AWS S3 client and sign method
+
+File sizes after gzip:
+
+```
+  108.71 KB (+1.17 KB)  build/static/js/2.0d33c129.chunk.js
+  1.82 KB (+174 B)      build/static/js/main.2c44fc0a.chunk.js
+  1.62 KB (+1 B)        build/static/js/3.294c4897.chunk.js
+  1.16 KB (-1 B)        build/static/js/runtime-main.fe5f8a5c.js
+  531 B                 build/static/css/main.8c8b27cf.chunk.css
+```

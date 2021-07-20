@@ -36,7 +36,7 @@ function App() {
   useEffect(() => {
     console.log({ organisationId, userId });
     fetch(
-      apiUrl + `?organisationId=${organisationId}&userId=${userId}&type=abac`
+      apiUrl + `?organisationId=${organisationId}&userId=${userId}`
     )
       .then((res) => res.json())
       .then((res) => {
