@@ -18,9 +18,21 @@ export class CdkInfraStack extends cdk.Stack {
           ],
           allowedOrigins: ["*"],
           allowedHeaders: ["*"],
+          exposedHeaders: ["ETag"],
         },
       ],
     });
+    // TODO: make sure the S3 bucket's CORS rules are configured properly
+    // see https://uppy.io/docs/aws-s3-multipart/
+    // <CORSRule>
+    //   <!-- Change from POST to PUT if you followed the docs for the AWS S3 plugin ... -->
+    //   <AllowedMethod>PUT</AllowedMethod>
+
+    //   <!-- ... keep the existing MaxAgeSeconds and AllowedHeader lines and your other stuff ... -->
+
+    //   <!-- ... and don't forget to add this tag. -->
+    //   <ExposeHeader>ETag</ExposeHeader>
+    // </CORSRule>
 
     const lambdaRole = new iam.Role(
       this,
