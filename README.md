@@ -81,3 +81,23 @@ File sizes after gzip:
   1.16 KB (-1 B)        build/static/js/runtime-main.fe5f8a5c.js
   531 B                 build/static/css/main.8c8b27cf.chunk.css
 ```
+
+## Upload to S3 with Uppy.io
+
+- I think there is no need to use the [Companion](https://uppy.io/docs/companion/) as this is only useful when uploading files directly from Google Drive, Dropbox etc. It will directly move files on the backend from the source to the destination in order to speed up the process so that it doesn't have to pass through the client and rely on the client's internet connection. May be useful at a later stage, but not in the initial version.
+- May be required to use this [Store](https://uppy.io/docs/stores/#Implementing-Stores) custom implementation to link Uppy's internal data to the data providers in ViewsTools.
+- This plugin may be useful for compressing images before sending to S3 https://github.com/arturi/uppy-plugin-image-compressor/blob/master/src/index.js
+- Could check this plugin as well in case there is anything useful in terms of how the process of uploading to S3 is handled https://github.com/joelvh/uppy-aws-amplify
+- Evaluate if we need to use AWS S3 multiplart uploads if the files are too big (not sure what is the limit, will have to investigate) https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
+- Evaluate if there is a need to configure [Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html) on the S3 bucket. Check also this speed checker http://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html. This may be useful, as the clinics are located all over US, so some of them may be farther from the region we use.
+- That looks useful - generate thumbnails https://uppy.io/docs/thumbnail-generator/
+- TODO - extract hooks for uploading to S3 and refreshing presigned S3 URL for accessing the files
+
+? not clear to me if they support resumable uploads when uploading directly to S3, or you would have to have an account on their platform?
+? do we want to support Webcam source as well? will people use the app on mobile? - if it's not a huge effort I think it might be useful
+
+## Install Uppy.io
+
+```
+yarn add @uppy/core @uppy/react @uppy/aws-s3-multipart
+```
