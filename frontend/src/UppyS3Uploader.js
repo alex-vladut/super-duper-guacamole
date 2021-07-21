@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Uppy from "@uppy/core";
 import { Dashboard, useUppy } from "@uppy/react";
 import AwsS3 from "@uppy/aws-s3";
@@ -14,16 +14,21 @@ import config from "./exports.json";
 const bucket = config.CdkInfraStack.BucketName;
 const region = config.CdkInfraStack.Region;
 
-let self;
-
 export function UppyS3Uploader(props) {
   const [prefix, setPrefix] = useState();
 
   const executeCreateUploadSignedUrl = useCreateUploadSignedUrl({ region });
 
-  // TODO: Uppy binds the methods passed to it to an internal "this" so it cannot access the variables defined here anymore
-  // maybe there is a better way to overcome this issue
-  self = { prefix, executeCreateUploadSignedUrl };
+  const prefixRef = useRef(prefix);
+  const executeCreateUploadSignedUrlRef = useRef(executeCreateUploadSignedUrl);
+
+  useEffect(() => {
+    prefixRef.current = prefix;
+  }, [prefix]);
+
+  useEffect(() => {
+    executeCreateUploadSignedUrlRef.current = executeCreateUploadSignedUrl;
+  }, [executeCreateUploadSignedUrl]);
 
   const uppy = useUppy(
     () =>
@@ -42,9 +47,9 @@ export function UppyS3Uploader(props) {
   );
 
   async function getUploadParameters(file) {
-    const url = await self.executeCreateUploadSignedUrl({
+    const url = await executeCreateUploadSignedUrlRef.current({
       bucket,
-      key: `${self.prefix}/${file.name}`,
+      key: `${prefixRef.current}/${file.name}`,
       contentType: file.type,
     });
     return {
