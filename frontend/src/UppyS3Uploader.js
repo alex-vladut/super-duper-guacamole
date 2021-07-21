@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Uppy from "@uppy/core";
 import { Dashboard, useUppy } from "@uppy/react";
 import AwsS3 from "@uppy/aws-s3";
@@ -19,25 +19,33 @@ export function UppyS3Uploader(props) {
 
   const executeCreateUploadSignedUrl = useCreateUploadSignedUrl({ region });
 
-  const prefixRef = useRef(prefix);
-  const executeCreateUploadSignedUrlRef = useRef(executeCreateUploadSignedUrl);
+  const uppy = useUppy(() => new Uppy(), []);
 
   useEffect(() => {
-    prefixRef.current = prefix;
-  }, [prefix]);
+    const plugin = uppy.getPlugin(AwsS3.name);
+    if (plugin) {
+      uppy.removePlugin(plugin);
+    }
 
-  useEffect(() => {
-    executeCreateUploadSignedUrlRef.current = executeCreateUploadSignedUrl;
-  }, [executeCreateUploadSignedUrl]);
-
-  const uppy = useUppy(
-    () =>
-      new Uppy().use(AwsS3, {
-        metaFields: ["name"],
-        getUploadParameters,
-      }),
-    []
-  );
+    uppy.use(AwsS3, {
+      metaFields: ["name"],
+      async getUploadParameters(file) {
+        const url = await executeCreateUploadSignedUrl({
+          bucket,
+          key: `${prefix}/${file.name}`,
+          contentType: file.type,
+        });
+        return {
+          method: "PUT",
+          url,
+          fields: [],
+          headers: {
+            "content-type": file.type,
+          },
+        };
+      },
+    });
+  }, [uppy, prefix, executeCreateUploadSignedUrl]);
 
   return (
     <div>
@@ -45,20 +53,4 @@ export function UppyS3Uploader(props) {
       <Dashboard uppy={uppy} proudlyDisplayPoweredByUppy={false} />
     </div>
   );
-
-  async function getUploadParameters(file) {
-    const url = await executeCreateUploadSignedUrlRef.current({
-      bucket,
-      key: `${prefixRef.current}/${file.name}`,
-      contentType: file.type,
-    });
-    return {
-      method: "PUT",
-      url,
-      fields: [],
-      headers: {
-        "content-type": file.type,
-      },
-    };
-  }
 }
