@@ -92,6 +92,7 @@ File sizes after gzip:
 - Evaluate if there is a need to configure [Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html) on the S3 bucket. Check also this speed checker http://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html. This may be useful, as the clinics are located all over US, so some of them may be farther from the region we use.
 - That looks useful - generate thumbnails https://uppy.io/docs/thumbnail-generator/
 - TODO - extract hooks for uploading to S3 and refreshing presigned S3 URL for accessing the files
+- restrict the types of files that can be uploaded with Uppy
 
 ? not clear to me if they support resumable uploads when uploading directly to S3, or you would have to have an account on their platform?
 ? do we want to support Webcam source as well? will people use the app on mobile? - if it's not a huge effort I think it might be useful

@@ -2,19 +2,17 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { useAuthenticatedUser } from "./useAuthenticatedUser";
 
-const Context = createContext({});
+const Context = createContext();
 
 export function AwsCredentialsProvider({ apiUrl, children }) {
-  const [credentials, setCredentials] = useState({});
+  const [credentials, setCredentials] = useState();
   const { organisationId, userId } = useAuthenticatedUser();
 
   useEffect(() => {
     if (!organisationId || !userId || !apiUrl) return;
 
-    async function updateCredentials() {
-      return fetch(
-        `${apiUrl}?organisationId=${organisationId}&userId=${userId}`
-      )
+    function updateCredentials() {
+      fetch(`${apiUrl}?organisationId=${organisationId}&userId=${userId}`)
         .then((res) => res.json())
         .then((res) => setCredentials(res.credentials));
     }

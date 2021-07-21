@@ -1,4 +1,4 @@
-import { SimpleUploader } from "./SimpleUploader";
+import { UppyS3Uploader } from "./UppyS3Uploader";
 
 import { AuthenticatedUserProvider } from "./hooks/useAuthenticatedUser";
 import { AwsCredentialsProvider } from "./hooks/useAwsCredentials";
@@ -10,7 +10,7 @@ function App() {
   return (
     <AuthenticatedUserProvider>
       <AwsCredentialsProvider apiUrl={apiUrl}>
-        <SimpleUploader />
+        <UppyS3Uploader />
       </AwsCredentialsProvider>
     </AuthenticatedUserProvider>
   );

@@ -2755,6 +2755,18 @@
     "@uppy/companion-client" "^1.10.2"
     "@uppy/utils" "^3.6.2"
 
+"@uppy/aws-s3@^1.7.12":
+  version "1.7.12"
+  resolved "https://registry.yarnpkg.com/@uppy/aws-s3/-/aws-s3-1.7.12.tgz#5fd3259afc06feb745129ee224f93b618934be63"
+  integrity sha512-9Q8EMg1vQlDrmhaLs5UUQn4kAszLa8E2c1c4mD2urkpS/jHofdF4geRRtp4g4/xvBwwtnhzGqPX4dIylvoZICQ==
+  dependencies:
+    "@uppy/companion-client" "^1.10.2"
+    "@uppy/utils" "^3.6.2"
+    "@uppy/xhr-upload" "^1.7.5"
+    cuid "^2.1.1"
+    qs-stringify "^1.1.0"
+    url-parse "^1.4.7"
+
 "@uppy/companion-client@^1.10.2":
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/@uppy/companion-client/-/companion-client-1.10.2.tgz#a640b3ef90b91751c49bf4b6a7a63c2ebac294f6"
@@ -2885,6 +2897,15 @@
   dependencies:
     abortcontroller-polyfill "^1.4.0"
     lodash.throttle "^4.1.1"
+
+"@uppy/xhr-upload@^1.7.5":
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/@uppy/xhr-upload/-/xhr-upload-1.7.5.tgz#990ba3e698503bd51534a59fd426096e37ef942b"
+  integrity sha512-Itnc9j9k/PemcmT5KrZ1BEw3pTc6WJg0yyyOcE+hLO8Hjv60Fm7c/I2ZknarOroIjT1WiTSyuxTBPp+9UGkxNA==
+  dependencies:
+    "@uppy/companion-client" "^1.10.2"
+    "@uppy/utils" "^3.6.2"
+    cuid "^2.1.1"
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"

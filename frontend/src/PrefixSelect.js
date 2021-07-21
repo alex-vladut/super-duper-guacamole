@@ -23,39 +23,53 @@ export function PrefixSelect({ onChange }) {
   }, [type, onChange, keys]);
 
   return (
-    <div>
-      <input
-        type="radio"
-        value="my_organisation_my_user"
-        name="my_organisation_my_user"
-        checked={type === "my_organisation_my_user"}
-        onChange={() => setType("my_organisation_my_user")}
-      />
-      My Organisation / My User
-      <input
-        type="radio"
-        value="my_organisation_different_user"
-        name="my_organisation_different_user"
-        checked={type === "my_organisation_different_user"}
-        onChange={() => setType("my_organisation_different_user")}
-      />
-      My Organisation / Different User
-      <input
-        type="radio"
-        value="different_organisation_my_user"
-        name="different_organisation_my_user"
-        checked={type === "different_organisation_my_user"}
-        onChange={() => setType("different_organisation_my_user")}
-      />
-      Different Organisation / My User
-      <input
-        type="radio"
-        value="different_organisation_different_user"
-        name="different_organisation_different_user"
-        checked={type === "different_organisation_different_user"}
-        onChange={() => setType("different_organisation_different_user")}
-      />
-      Different Organisation / Different User
+    <div
+      style={{
+        margin: "20px",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <label>
+        <input
+          type="radio"
+          value="my_organisation_my_user"
+          name="my_organisation_my_user"
+          checked={type === "my_organisation_my_user"}
+          onChange={() => setType("my_organisation_my_user")}
+        />
+        My Organisation / My User
+      </label>
+      <label>
+        <input
+          type="radio"
+          value="my_organisation_different_user"
+          name="my_organisation_different_user"
+          checked={type === "my_organisation_different_user"}
+          onChange={() => setType("my_organisation_different_user")}
+        />
+        My Organisation / Different User
+      </label>
+      <label>
+        <input
+          type="radio"
+          value="different_organisation_my_user"
+          name="different_organisation_my_user"
+          checked={type === "different_organisation_my_user"}
+          onChange={() => setType("different_organisation_my_user")}
+        />
+        Different Organisation / My User
+      </label>
+      <label>
+        <input
+          type="radio"
+          value="different_organisation_different_user"
+          name="different_organisation_different_user"
+          checked={type === "different_organisation_different_user"}
+          onChange={() => setType("different_organisation_different_user")}
+        />
+        Different Organisation / Different User
+      </label>
     </div>
   );
 }
