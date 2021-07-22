@@ -1,6 +1,24 @@
 ## Description
 
-A simple project to prototype implementing a Token Vending Machine for accessing AWS resources in a multi-tenant architecture. The mechanism is described in the AWS Whitepaper [SaaS Tenant Isolation Strategies](https://d1.awsstatic.com/whitepapers/saas-tenant-isolation-strategies.pdf) and [this article](https://aws.amazon.com/blogs/apn/isolating-saas-tenants-with-dynamically-generated-iam-policies/), for the implementation specific details. Another interesting read is [this article](https://aws.amazon.com/blogs/security/how-to-implement-saas-tenant-isolation-with-abac-and-aws-iam/) where ABAC is used for the access strategy instead of dynamically generating IAM policies.
+The project prototypes a solution for implementing a `Token Vending Machine` to dynamically generating short-lived AWS access tokens and allow clients to directly interact with AWS services instead of having to provide an API endpoint for every action. This approach is enabled by the [AWS SDK v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html) which offers a more modularised and allows importing only the clients being used.
+
+The implementation is based on the mechanism described in the AWS Whitepaper [SaaS Tenant Isolation Strategies](https://d1.awsstatic.com/whitepapers/saas-tenant-isolation-strategies.pdf) and in [this article](https://aws.amazon.com/blogs/apn/isolating-saas-tenants-with-dynamically-generated-iam-policies/) to access AWS resources in a multi-tenant architecture.
+
+The `Token Vending Machine` implementation supports 2 approaches:
+
+- dynamic policies attached to a role (this is the approach suggested in the whitepaper and article referenced above)
+- ABAC authorization model by making use of IAM session tags. Read [What is ABAC for AWS?](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_attribute-based-access-control.html) and [IAM tutorial: Define permissions to access AWS resources based on tags](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_attribute-based-access-control.html) for a more in depth description on how ABAC model is achieved and how it compares with the traditional RBAC model supported by AWS IAM.
+
+The main advantage of dynamic policies is that it is highly customizable and more complex rules could be defined even when a specific construct is not available through IAM policies JSON format (e.g. it only supports a limited set of comparison functions such as `StringEquals` or `StringLike`, but with dynamic policies you could use anything your programming language of choice offers). The limitation is that it only allows 1 session policy to be provided when assuming a role and it shouldn't exceed `2048` characters.
+The advantages of ABAC, on the other hand, are that it will keep the logic in a single place (i.e. alongside the role's definition) and you can [attach up to 10 policies to a role](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html).
+
+Luckily both approaches could be combined, so there is no need to choose one over the other. The approach suggested is to start by using dynamic policies as those give you the most flexibility and then move some of the statements on the roles once the above limit of `2048` characters is exceeded.
+
+### Exploring replacing the custom implementation of a `Token Vending Machine` with AWS IoT service
+
+**Assumption:** Based on the description provided in [this article](https://aws.amazon.com/blogs/security/how-to-eliminate-the-need-for-hardcoded-aws-credentials-in-devices-by-using-the-aws-iot-credentials-provider/), there may be an improvement available for replacing the custom Lambda function used for implementing a `Token Vending Machine` with the [AWS IoT Credentials Provider Service](https://docs.aws.amazon.com/iot/latest/developerguide/authorizing-direct-aws.html).
+
+AWS IoT service seems to expect a certificate to be registered on the devices as the certificate is used to identify the device and based on that it the IoT Credentials Provider service could associate an IAM role and generate AWS credentials for interacting directly with AWS services. [This article](https://alsmola.medium.com/using-aws-iot-for-mutual-tls-in-a-web-application-5d379eb7a778) describes the process of registering a certificate which seems to be very tedious and has to be done on every computer (surely it is not feasible). The other limitation is that there doesn't seem to be a way for the Credentials Provider service to generate AWS access keys based on a random JWT. On top of that I don't think there is any way to set a session policy based on the JWT's claims or set some IAM session tags based on the claims.
 
 ## Prerequisites
 
@@ -31,12 +49,6 @@ cdk deploy --profile <profile-name> -O ../frontend/src/exports.json
 cd frontend
 yarn start
 ```
-
-## Investigate
-
-- Is it safe to expose AWS credentials on the client side? => most likely should be OK, as those are short-lived and will have a very limited set of permissions attached to it anyways
-- How can we restrict the types of files a user is allowed to upload and the maximum size of a file?
-- Should evaluate the deployment bundle size (they say AWS SDK v3 is tree shakable, but should check if it's still too big for the client)
 
 ## Other resources
 
@@ -101,18 +113,11 @@ File sizes after gzip:
 - May be required to use this [Store](https://uppy.io/docs/stores/#Implementing-Stores) custom implementation to link Uppy's internal data to the data providers in ViewsTools.
 - This plugin may be useful for compressing images before sending to S3 https://github.com/arturi/uppy-plugin-image-compressor/blob/master/src/index.js
 - Evaluate if there is a need to configure [Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html) on the S3 bucket. Check also this speed checker http://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html. This may be useful, as the clinics are located all over US, so some of them may be farther from the region we use.
-- That looks useful - generate thumbnails https://uppy.io/docs/thumbnail-generator/
-- restrict the types of files that can be uploaded with Uppy
 - integrate the application with Minio for easier testing locally. I have to check if Minio supports multipart upload
 - Consider using [Golden Retriever](https://uppy.io/docs/golden-retriever/) plugin to save the upload state on page refresh so that the user doesn't have to reupload the files in case the browser crashed.
 - Here is a great article on how you can customise the Uppy Dashboard and allow meta fields to be edited or adding tags https://community.transloadit.com/t/uppy-aws-s3-pre-signed-url-nodejs-complete-example-including-metadata-and-tags/15137/5
 - To restrict the permissions on S3 bucket, here are the permissions necessary for Multipart upload https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html#mpuAndPermissions
 
-? not clear to me if they support resumable uploads when uploading directly to S3, or you would have to have an account on their platform?
-? do we want to support Webcam source as well? will people use the app on mobile? - if it's not a huge effort I think it might be useful
+## Further improvements:
 
-## Install Uppy.io
-
-```
-yarn add @uppy/core @uppy/react @uppy/aws-s3-multipart
-```
+- possibly replace the AWS SDK client side with direct API calls signed with AWS Signer V4 in order to reduce build bundle size
