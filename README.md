@@ -82,17 +82,31 @@ File sizes after gzip:
   531 B                 build/static/css/main.8c8b27cf.chunk.css
 ```
 
+## With Uppy.io
+
+File sizes after gzip:
+
+```
+  188.55 KB (+79.83 KB)  build/static/js/2.8a25f9c4.chunk.js
+  10.12 KB               build/static/css/2.2fe82265.chunk.css
+  2.42 KB (+615 B)       build/static/js/main.90115d6b.chunk.js
+  1.62 KB                build/static/js/3.725a8cb9.chunk.js
+  1.17 KB (+2 B)         build/static/js/runtime-main.786f0666.js
+  278 B (-253 B)         build/static/css/main.6dea0f05.chunk.css
+```
+
 ## Upload to S3 with Uppy.io
 
-- I think there is no need to use the [Companion](https://uppy.io/docs/companion/) as this is only useful when uploading files directly from Google Drive, Dropbox etc. It will directly move files on the backend from the source to the destination in order to speed up the process so that it doesn't have to pass through the client and rely on the client's internet connection. May be useful at a later stage, but not in the initial version.
+- I think there is no need to use the [Companion](https://uppy.io/docs/companion/) as this is only useful when uploading files directly from Google Drive, Dropbox etc. It will directly move files on the backend from the source to the destination in order to speed up the process so that it doesn't have to pass through the client and rely on the client's internet connection. Another functionality provided by the Companion is interacting with AWS S3 for uploading with multipart so that the client's won't have access to the AWS credentials (those will be stored server side and the server manages the interaction with S3 to initiate multipart upload, generate signed URLs, complete upload etc.) May be useful at a later stage, but not in the initial version.
 - May be required to use this [Store](https://uppy.io/docs/stores/#Implementing-Stores) custom implementation to link Uppy's internal data to the data providers in ViewsTools.
 - This plugin may be useful for compressing images before sending to S3 https://github.com/arturi/uppy-plugin-image-compressor/blob/master/src/index.js
-- Could check this plugin as well in case there is anything useful in terms of how the process of uploading to S3 is handled https://github.com/joelvh/uppy-aws-amplify
-- Evaluate if we need to use AWS S3 multiplart uploads if the files are too big (not sure what is the limit, will have to investigate) https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
 - Evaluate if there is a need to configure [Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html) on the S3 bucket. Check also this speed checker http://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html. This may be useful, as the clinics are located all over US, so some of them may be farther from the region we use.
 - That looks useful - generate thumbnails https://uppy.io/docs/thumbnail-generator/
-- TODO - extract hooks for uploading to S3 and refreshing presigned S3 URL for accessing the files
 - restrict the types of files that can be uploaded with Uppy
+- integrate the application with Minio for easier testing locally. I have to check if Minio supports multipart upload
+- Consider using [Golden Retriever](https://uppy.io/docs/golden-retriever/) plugin to save the upload state on page refresh so that the user doesn't have to reupload the files in case the browser crashed.
+- Here is a great article on how you can customise the Uppy Dashboard and allow meta fields to be edited or adding tags https://community.transloadit.com/t/uppy-aws-s3-pre-signed-url-nodejs-complete-example-including-metadata-and-tags/15137/5
+- To restrict the permissions on S3 bucket, here are the permissions necessary for Multipart upload https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html#mpuAndPermissions
 
 ? not clear to me if they support resumable uploads when uploading directly to S3, or you would have to have an account on their platform?
 ? do we want to support Webcam source as well? will people use the app on mobile? - if it's not a huge effort I think it might be useful

@@ -25,7 +25,16 @@ export function UppyS3MultipartUploader(props) {
     executeCompleteMultipartUpload,
   } = useUploadMultipart({ region });
 
-  const uppy = useUppy(() => new Uppy(), []);
+  const uppy = useUppy(
+    () =>
+      new Uppy({
+        restrictions: {
+          maxFileSize: 100000000, // 100MB
+          allowedFileTypes: ["image/*", "application/pdf"],
+        },
+      }),
+    []
+  );
 
   useEffect(() => {
     const plugin = uppy.getPlugin(AwsS3Multipart.name);
