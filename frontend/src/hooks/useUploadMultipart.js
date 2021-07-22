@@ -6,6 +6,7 @@ import {
   UploadPartCommand,
   AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,
+  PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -35,6 +36,7 @@ export function useUploadMultipart({ region }) {
     executePrepareUploadPart,
     executeAbortMultipartUpload,
     executeCompleteMultipartUpload,
+    executeUploadThumbnail,
   };
 
   async function executeCreateMultipartUpload({ bucket, key, contentType }) {
@@ -109,5 +111,15 @@ export function useUploadMultipart({ region }) {
     });
     const response = await client.send(command);
     return { location: response.Location };
+  }
+
+  async function executeUploadThumbnail({ bucket, key, contentType, body }) {
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: contentType,
+      Body: body,
+    });
+    return client.send(command);
   }
 }

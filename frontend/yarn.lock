@@ -2827,6 +2827,15 @@
     "@uppy/utils" "^3.6.2"
     preact "8.2.9"
 
+"@uppy/image-editor@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@uppy/image-editor/-/image-editor-0.3.0.tgz#096dea2826ea7c3922802772f8cdf770e175d260"
+  integrity sha512-yqRF4/eDsRg9nLjeYpOuOUp9d1lhqyzNaBB3SPa66wPRvl+osIK4f3Euqr1Br+QqbHksjtfYGDbPPPF6dzIIrw==
+  dependencies:
+    "@uppy/utils" "^3.6.2"
+    cropperjs "1.5.7"
+    preact "8.2.9"
+
 "@uppy/informer@^1.6.6":
   version "1.6.6"
   resolved "https://registry.npmjs.org/@uppy/informer/-/informer-1.6.6.tgz"
@@ -4521,6 +4530,11 @@ create-hmac@^1.1.0, create-hmac@^1.1.4, create-hmac@^1.1.7:
     ripemd160 "^2.0.0"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+cropperjs@1.5.7:
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/cropperjs/-/cropperjs-1.5.7.tgz#b65019725bae1c6285e881fb661b2141fa57025b"
+  integrity sha512-sGj+G/ofKh+f6A4BtXLJwtcKJgMUsXYVUubfTo9grERiDGXncttefmue/fyQFvn8wfdyoD1KhDRYLfjkJFl0yw==
 
 cross-spawn@7.0.3, cross-spawn@^7.0.0, cross-spawn@^7.0.2:
   version "7.0.3"
