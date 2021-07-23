@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import Uppy from "@uppy/core";
 import { Dashboard, useUppy } from "@uppy/react";
+import ImageEditor from "@uppy/image-editor";
+import Webcam from "@uppy/webcam";
+import ScreenCapture from "@uppy/screen-capture";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 
 import { PrefixSelect } from "./PrefixSelect";
@@ -26,50 +29,22 @@ export function UppyS3MultipartUploader(props) {
     executeUploadThumbnail,
   } = useUploadMultipart({ region });
 
-  const prefixRef = useRef(prefix);
-  const executeUploadThumbnailRef = useRef(executeUploadThumbnail);
+  const uppy = useUppy(
+    () =>
+      new Uppy({
+        restrictions: {
+          maxFileSize: 100000000, // 100MB
+          allowedFileTypes: ["image/*", "application/pdf"],
+        },
+      })
+        .use(ImageEditor, {})
+        .use(Webcam, {})
+        .use(ScreenCapture, {}),
+    []
+  );
 
-  // This is necessary because Uppy is binding the event listeners to some other "this"
-  // and as a result it doesn't have access to the component's current state (it only references the initial instance of executeUploadThumbnail in which the S3 client may not have yet been initialised)
-  useEffect(() => {
-    executeUploadThumbnailRef.current = executeUploadThumbnail;
-  }, [executeUploadThumbnail]);
-
-  useEffect(() => {
-    prefixRef.current = prefix;
-  }, [prefix]);
-
-  const uppy = useUppy(() => {
-    const result = new Uppy({
-      restrictions: {
-        maxFileSize: 100000000, // 100MB
-        allowedFileTypes: ["image/*", "application/pdf"],
-      },
-    });
-    result.on("thumbnail:generated", async (file, preview) => {
-      const blobFile = await fetch(preview).then((r) => r.blob());
-
-      const thumbnail = new File([blobFile], `${file.name}_thumbnail.jpg`, {
-        lastModified: new Date(),
-        type: "image/jpg", // Thumbnail generate is image/jpg by default. could be changed to image/png if you want to have transparent background
-      });
-
-      result.setFileMeta(file.id, { thumbnail });
-    });
-    result.on("upload-success", async (file) => {
-      if (!file.meta.thumbnail) return;
-      console.log(file.meta.thumbnail);
-
-      const body = await file.meta.thumbnail.arrayBuffer();
-      await executeUploadThumbnailRef.current({
-        bucket,
-        key: `${prefixRef.current}/${file.meta.thumbnail.name}`,
-        contentType: file.meta.thumbnail.type,
-        body,
-      });
-    });
-    return result;
-  }, []);
+  const thumbnailGeneratedEventRef = useRef();
+  const uploadSuccessEventRef = useRef();
 
   useEffect(() => {
     const plugin = uppy.getPlugin(AwsS3Multipart.name);
@@ -121,6 +96,36 @@ export function UppyS3MultipartUploader(props) {
         });
       },
     });
+
+    if (thumbnailGeneratedEventRef.current) {
+      uppy.off("thumbnail:generated", thumbnailGeneratedEventRef.current);
+    }
+    thumbnailGeneratedEventRef.current = async (file, preview) => {
+      const blobFile = await fetch(preview).then((r) => r.blob());
+
+      const thumbnail = new File([blobFile], `${file.name}_thumbnail.jpg`, {
+        lastModified: new Date(),
+        type: "image/jpg", // Thumbnail generate is image/jpg by default. could be changed to image/png if you want to have transparent background
+      });
+
+      uppy.setFileMeta(file.id, { thumbnail });
+    };
+    uppy.on("thumbnail:generated", thumbnailGeneratedEventRef.current);
+
+    if (uploadSuccessEventRef.current) {
+      uppy.off("upload-success", uploadSuccessEventRef.current);
+    }
+    uploadSuccessEventRef.current = async (file) => {
+      if (!file.meta.thumbnail) return;
+      const body = await file.meta.thumbnail.arrayBuffer();
+      await executeUploadThumbnail({
+        bucket,
+        key: `${prefix}/${file.meta.thumbnail.name}`,
+        contentType: file.meta.thumbnail.type,
+        body,
+      });
+    };
+    uppy.on("upload-success", uploadSuccessEventRef.current);
   }, [
     uppy,
     prefix,
@@ -129,6 +134,7 @@ export function UppyS3MultipartUploader(props) {
     executePrepareUploadPart,
     executeAbortMultipartUpload,
     executeCompleteMultipartUpload,
+    executeUploadThumbnail,
   ]);
 
   return (
@@ -137,7 +143,7 @@ export function UppyS3MultipartUploader(props) {
       <Dashboard
         uppy={uppy}
         proudlyDisplayPoweredByUppy={false}
-        plugins={["ImageEditor"]}
+        plugins={[Webcam.name, ScreenCapture.name, ImageEditor.name]}
         metaFields={[{ id: "name", name: "Name", placeholder: "File name" }]}
       />
     </div>

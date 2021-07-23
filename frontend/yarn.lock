@@ -2874,6 +2874,14 @@
     "@uppy/utils" "^3.6.2"
     prop-types "^15.6.1"
 
+"@uppy/screen-capture@^1.0.21":
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/@uppy/screen-capture/-/screen-capture-1.0.21.tgz#2cb23e132ac8a42335a764dc6aeb945e3a70935a"
+  integrity sha512-4uFWxI7zZcN+JjJyHXM44uglggezpsvZxmn0ax8BM/bK4yZkDOOQuAS2VoJx84Yre2lo6zplTNhbDquX1xGC3g==
+  dependencies:
+    "@uppy/utils" "^3.6.2"
+    preact "8.2.9"
+
 "@uppy/status-bar@^1.9.6":
   version "1.9.6"
   resolved "https://registry.npmjs.org/@uppy/status-bar/-/status-bar-1.9.6.tgz"
@@ -2906,6 +2914,14 @@
   dependencies:
     abortcontroller-polyfill "^1.4.0"
     lodash.throttle "^4.1.1"
+
+"@uppy/webcam@^1.8.12":
+  version "1.8.12"
+  resolved "https://registry.yarnpkg.com/@uppy/webcam/-/webcam-1.8.12.tgz#860197012f7f340ad30170d03b47a5b7b336a73e"
+  integrity sha512-tyfpOpigsqYglyDoUoC8sQGPVcP9w12WN8aWVR3WMUbXqSPDAv+bmc1P2RVn0xfxOVgiOkcvKxjyAQ0PU2pBpA==
+  dependencies:
+    "@uppy/utils" "^3.6.2"
+    preact "8.2.9"
 
 "@uppy/xhr-upload@^1.7.5":
   version "1.7.5"
