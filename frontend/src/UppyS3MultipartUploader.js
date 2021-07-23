@@ -4,6 +4,7 @@ import { Dashboard, useUppy } from "@uppy/react";
 import ImageEditor from "@uppy/image-editor";
 import Webcam from "@uppy/webcam";
 import ScreenCapture from "@uppy/screen-capture";
+import UppyImageCompressor from "uppy-plugin-image-compressor";
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 
 import { PrefixSelect } from "./PrefixSelect";
@@ -39,7 +40,10 @@ export function UppyS3MultipartUploader(props) {
       })
         .use(ImageEditor, {})
         .use(Webcam, {})
-        .use(ScreenCapture, {}),
+        .use(ScreenCapture, {})
+        // not sure this is really that useful. see https://github.com/arturi/uppy-plugin-image-compressor
+        // maybe best to start without it and only add if you notice any issues
+        .use(UppyImageCompressor, {}),
     []
   );
 
@@ -143,7 +147,12 @@ export function UppyS3MultipartUploader(props) {
       <Dashboard
         uppy={uppy}
         proudlyDisplayPoweredByUppy={false}
-        plugins={[Webcam.name, ScreenCapture.name, ImageEditor.name]}
+        plugins={[
+          Webcam.name,
+          ScreenCapture.name,
+          ImageEditor.name,
+          UppyImageCompressor.name,
+        ]}
         metaFields={[{ id: "name", name: "Name", placeholder: "File name" }]}
       />
     </div>
